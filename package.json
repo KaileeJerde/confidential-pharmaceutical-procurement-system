@@ -1,0 +1,32 @@
+{
+  "name": "privacy-pharma-dapp",
+  "version": "1.0.0",
+  "description": "Anonymous pharmaceutical procurement using Fully Homomorphic Encryption",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx http-server public -p 3000 -c-1 --cors",
+    "dev": "npx http-server public -p 3000 -c-1 --cors",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.js --network sepolia",
+    "test": "npx hardhat test"
+  },
+  "keywords": [
+    "blockchain",
+    "fhe",
+    "privacy",
+    "pharmaceutical",
+    "zama",
+    "ethereum",
+    "smart-contracts"
+  ],
+  "author": "Privacy Pharma Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "@fhevm/solidity": "^0.4.0",
+    "ethers": "^5.7.2"
+  }
+}
