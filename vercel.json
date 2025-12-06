@@ -1,5 +1,6 @@
 {
-  "buildCommand": "npm run compile",
+  "installCommand": "echo 'Skipping dependencies for static site'",
+  "buildCommand": "echo 'No build needed for static site'",
   "outputDirectory": "public",
   "cleanUrls": true,
   "rewrites": [

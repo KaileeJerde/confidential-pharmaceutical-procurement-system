@@ -1,5 +1,5 @@
 {
-  "name": "privacy-pharma-dapp",
+  "name": "privacy-pharma",
   "version": "1.0.0",
   "description": "Anonymous pharmaceutical procurement using Fully Homomorphic Encryption",
   "main": "index.js",
@@ -8,7 +8,8 @@
     "dev": "npx http-server public -p 3000 -c-1 --cors",
     "compile": "npx hardhat compile",
     "deploy": "npx hardhat run scripts/deploy.js --network sepolia",
-    "test": "npx hardhat test"
+    "test": "npx hardhat test",
+    "vercel-build": "echo 'Static site - no build needed'"
   },
   "keywords": [
     "blockchain",
@@ -23,9 +24,7 @@
   "license": "MIT",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
-    "hardhat": "^2.19.0"
-  },
-  "dependencies": {
+    "hardhat": "^2.19.0",
     "@fhevm/solidity": "^0.4.0",
     "ethers": "^5.7.2"
   }
