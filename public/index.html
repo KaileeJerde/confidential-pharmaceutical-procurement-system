@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivacyPharma - Anonymous Pharmaceutical Procurement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff69b4 0%, #ffb6c1 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background-color: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status.error {
+            background-color: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fc8181;
+        }
+
+        .status.info {
+            background-color: #bee3f8;
+            color: #2a69ac;
+            border: 1px solid #90cdf4;
+        }
+
+        .orders-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .order-item {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .order-item h4 {
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .order-meta {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .wallet-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .grid-full {
+            grid-column: 1 / -1;
+        }
+
+        .contract-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 PrivacyPharma</h1>
+            <p>Anonymous Pharmaceutical Procurement using Fully Homomorphic Encryption</p>
+        </div>
+
+        <div class="wallet-info" id="walletInfo">
+            <p>Loading application...</p>
+        </div>
+
+        <!-- Debug Panel -->
+        <div class="wallet-info" style="background: rgba(255, 255, 255, 0.1); margin-top: 10px;">
+            <h4 style="color: white; margin-bottom: 10px;">🔧 Debug Panel</h4>
+            <button id="testMetaMask" class="btn" style="max-width: 200px; margin: 5px;">
+                Test MetaMask
+            </button>
+            <button id="testEthers" class="btn" style="max-width: 200px; margin: 5px;">
+                Test Ethers.js
+            </button>
+            <div id="debugOutput" style="color: white; font-size: 0.9em; margin-top: 10px; max-height: 100px; overflow-y: auto;"></div>
+        </div>
+
+        <div class="contract-info" id="contractInfo" style="display: none;">
+            <p><strong>Contract Address:</strong> <span id="contractAddress">Not configured</span></p>
+            <p><strong>Network:</strong> Sepolia Testnet</p>
+            <p><strong>Status:</strong> <span id="contractStatus">Checking...</span></p>
+        </div>
+
+        <div class="main-content">
+            <!-- Buyer Panel -->
+            <div class="panel">
+                <h2>📋 Create Order (Buyer)</h2>
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="drugId">Drug ID:</label>
+                        <input type="number" id="drugId" min="1" placeholder="Enter drug identifier" required disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" min="1" placeholder="Enter quantity needed" required disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="maxBudget">Maximum Budget (Wei):</label>
+                        <input type="number" id="maxBudget" min="1" placeholder="Enter maximum budget" required disabled>
+                    </div>
+                    <button type="submit" class="btn" disabled>Create Anonymous Order</button>
+                </form>
+                <div id="orderStatus" class="status" style="display: none;"></div>
+                <div class="status info" id="orderFormDisabled">
+                    <p>Connect your wallet to create orders</p>
+                </div>
+            </div>
+
+            <!-- Supplier Panel -->
+            <div class="panel">
+                <h2>💊 Submit Bid (Supplier)</h2>
+                <form id="bidForm">
+                    <div class="form-group">
+                        <label for="orderIdBid">Order ID:</label>
+                        <input type="number" id="orderIdBid" min="1" placeholder="Enter order ID to bid on" required disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="bidPrice">Your Price (Wei):</label>
+                        <input type="number" id="bidPrice" min="1" placeholder="Enter your price" required disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="availableQuantity">Available Quantity:</label>
+                        <input type="number" id="availableQuantity" min="1" placeholder="Enter available quantity" required disabled>
+                    </div>
+                    <button type="submit" class="btn" disabled>Submit Encrypted Bid</button>
+                </form>
+                <div id="bidStatus" class="status" style="display: none;"></div>
+                <div class="status info" id="bidFormDisabled">
+                    <p>Connect your wallet to submit bids</p>
+                </div>
+            </div>
+
+            <!-- Order Management Panel -->
+            <div class="panel">
+                <h2>🎯 Match Order</h2>
+                <form id="matchForm">
+                    <div class="form-group">
+                        <label for="orderIdMatch">Order ID to Match:</label>
+                        <input type="number" id="orderIdMatch" min="1" placeholder="Enter order ID" required disabled>
+                    </div>
+                    <button type="submit" class="btn" disabled>Find Best Supplier</button>
+                </form>
+                <div id="matchStatus" class="status" style="display: none;"></div>
+                <div class="status info" id="matchFormDisabled">
+                    <p>Connect your wallet to match orders</p>
+                </div>
+            </div>
+
+            <!-- Fulfillment Panel -->
+            <div class="panel">
+                <h2>✅ Fulfill Order</h2>
+                <form id="fulfillForm">
+                    <div class="form-group">
+                        <label for="orderIdFulfill">Order ID to Fulfill:</label>
+                        <input type="number" id="orderIdFulfill" min="1" placeholder="Enter order ID" required disabled>
+                    </div>
+                    <button type="submit" class="btn" disabled>Fulfill Order</button>
+                </form>
+                <div id="fulfillStatus" class="status" style="display: none;"></div>
+                <div class="status info" id="fulfillFormDisabled">
+                    <p>Connect your wallet to fulfill orders</p>
+                </div>
+            </div>
+
+            <!-- Orders Display -->
+            <div class="panel grid-full">
+                <h2>📊 Recent Orders</h2>
+                <button id="refreshOrders" class="btn" disabled>Refresh Orders</button>
+                <div class="loading" id="ordersLoading">
+                    <div class="spinner"></div>
+                    <p>Loading orders...</p>
+                </div>
+                <div class="orders-list" id="ordersList">
+                    <div class="status info">
+                        <p>Connect your wallet to view orders</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div class="panel grid-full">
+                <h2>👑 Admin Panel</h2>
+                <form id="verifyForm">
+                    <div class="form-group">
+                        <label for="supplierAddress">Supplier Address to Verify:</label>
+                        <input type="text" id="supplierAddress" placeholder="0x..." required disabled>
+                    </div>
+                    <button type="submit" class="btn" disabled>Verify Supplier</button>
+                </form>
+                <div id="verifyStatus" class="status" style="display: none;"></div>
+                <div class="status info" id="verifyFormDisabled">
+                    <p>Connect your wallet to verify suppliers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script>
+        // Fallback CDN loading for ethers.js
+        if (typeof ethers === 'undefined') {
+            console.log('Primary ethers.js CDN failed, trying fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js';
+            script.onload = function() {
+                console.log('Fallback ethers.js loaded successfully');
+                if (typeof ethers !== 'undefined') {
+                    init();
+                }
+            };
+            script.onerror = function() {
+                console.error('Both ethers.js CDNs failed to load');
+                document.getElementById('walletInfo').innerHTML = `
+                    <p style="color: #fed7d7;">Failed to load required libraries. Please refresh the page.</p>
+                `;
+            };
+            document.head.appendChild(script);
+        }
+
+        // Contract configuration - UPDATE THESE VALUES AFTER DEPLOYMENT
+        const CONTRACT_ADDRESS = "0xAa50220e207c8E7AbFf107De9436cd699C7f7F38"; // Replace with actual deployed contract address
+        const SEPOLIA_RPC_URL = "https://sepolia.infura.io/v3/YOUR_INFURA_KEY"; // Replace with your RPC URL
+
+        const CONTRACT_ABI = [
+            "function createOrder(uint32 _drugId, uint32 _quantity, uint64 _maxBudget) external",
+            "function submitBid(uint32 orderId, uint64 _price, uint32 _availableQuantity) external",
+            "function matchOrder(uint32 orderId) external",
+            "function fulfillOrder(uint32 orderId) external",
+            "function verifySupplier(address supplier) external",
+            "function getOrderInfo(uint32 orderId) external view returns (bool, bool, address, address, uint256, uint256)",
+            "function getCurrentOrderId() external view returns (uint32)",
+            "function isVerifiedSupplier(address supplier) external view returns (bool)",
+            "function getBidStatus(uint32 orderId, address supplier) external view returns (bool, uint256, bool)",
+            "function owner() external view returns (address)",
+            "event OrderCreated(uint32 indexed orderId, address indexed buyer, uint256 orderTime)",
+            "event BidSubmitted(address indexed supplier, uint32 indexed orderId)",
+            "event OrderMatched(uint32 indexed orderId, address indexed buyer, address indexed supplier)",
+            "event OrderFulfilled(uint32 indexed orderId, uint32 drugId, uint32 quantity, uint64 price)",
+            "event SupplierVerified(address indexed supplier)"
+        ];
+
+        let provider, signer, contract, userAddress;
+
+        // Initialize Web3 connection
+        async function init() {
+            console.log('=== Initializing Application ===');
+            console.log('MetaMask available:', typeof window.ethereum !== 'undefined');
+            console.log('Ethers.js loaded:', typeof ethers !== 'undefined');
+
+            if (typeof window.ethereum !== 'undefined') {
+                // Show connect wallet button
+                document.getElementById('walletInfo').innerHTML = `
+                    <p>Ready to connect to PrivacyPharma</p>
+                    <button id="connectWallet" class="btn" style="max-width: 300px; margin: 10px auto;">
+                        Connect Wallet
+                    </button>
+                `;
+
+                // Setup connect wallet button
+                document.getElementById('connectWallet').addEventListener('click', connectWallet);
+            } else {
+                document.getElementById('walletInfo').innerHTML = `
+                    <p style="color: #fed7d7;">Please install MetaMask to use this application</p>
+                    <p><a href="https://metamask.io" target="_blank" style="color: white;">Download MetaMask</a></p>
+                `;
+            }
+
+            // Setup debug buttons
+            setupDebugButtons();
+        }
+
+        function setupDebugButtons() {
+            const debugOutput = document.getElementById('debugOutput');
+
+            function addDebugLine(message) {
+                if (debugOutput) {
+                    debugOutput.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+                    debugOutput.scrollTop = debugOutput.scrollHeight;
+                }
+                console.log('DEBUG:', message);
+            }
+
+            document.getElementById('testMetaMask').addEventListener('click', function() {
+                addDebugLine('Testing MetaMask...');
+                addDebugLine('window.ethereum: ' + (typeof window.ethereum));
+                addDebugLine('window.ethereum.isMetaMask: ' + (window.ethereum && window.ethereum.isMetaMask));
+                addDebugLine('window.ethereum.request: ' + (typeof window.ethereum?.request));
+            });
+
+            document.getElementById('testEthers').addEventListener('click', function() {
+                addDebugLine('Testing Ethers.js...');
+                addDebugLine('ethers: ' + (typeof ethers));
+                addDebugLine('ethers.providers: ' + (typeof ethers?.providers));
+                addDebugLine('ethers.providers.Web3Provider: ' + (typeof ethers?.providers?.Web3Provider));
+
+                if (typeof ethers !== 'undefined' && window.ethereum) {
+                    try {
+                        const testProvider = new ethers.providers.Web3Provider(window.ethereum);
+                        addDebugLine('✅ Provider creation successful');
+                    } catch (error) {
+                        addDebugLine('❌ Provider creation failed: ' + error.message);
+                    }
+                }
+            });
+        }
+
+        // Connect wallet function
+        async function connectWallet() {
+            console.log('=== Connect Wallet Started ===');
+            try {
+                const connectButton = document.getElementById('connectWallet');
+                if (!connectButton) {
+                    console.error('Connect button not found');
+                    return;
+                }
+
+                connectButton.textContent = 'Connecting...';
+                connectButton.disabled = true;
+
+                // Check if MetaMask is available
+                console.log('Checking MetaMask availability...');
+                console.log('window.ethereum:', typeof window.ethereum);
+                console.log('ethers:', typeof ethers);
+
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask is not installed');
+                }
+
+                if (typeof ethers === 'undefined') {
+                    throw new Error('Ethers.js library not loaded');
+                }
+
+                console.log('Creating Web3 provider...');
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                console.log('Provider created:', provider);
+
+                console.log('Requesting account access...');
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log('Accounts received:', accounts);
+
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                console.log('Connected to:', userAddress);
+
+                // Check network
+                const network = await provider.getNetwork();
+                console.log('Network:', network);
+
+                // Update wallet info immediately even without contract
+                updateWalletInfo();
+
+                // Check if contract address is configured
+                if (CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+                    document.getElementById('contractInfo').innerHTML = `
+                        <p><strong>Contract Address:</strong> Not configured</p>
+                        <p><strong>Status:</strong> <span style="color: #fed7d7;">Contract address needs to be configured</span></p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">The wallet is connected, but you need to deploy the contract and update the CONTRACT_ADDRESS in the code.</p>
+                    `;
+                    document.getElementById('contractInfo').style.display = 'block';
+                    enableForms(); // Enable forms even without contract for testing
+                    return;
+                }
+
+                // Initialize contract
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                console.log('Contract initialized:', CONTRACT_ADDRESS);
+
+                // Verify contract is deployed and accessible
+                await verifyContractConnection();
+
+                setupEventListeners();
+                loadOrders();
+                enableForms();
+
+            } catch (error) {
+                console.error("Failed to connect to wallet:", error);
+
+                // Determine error type and show appropriate message
+                let errorMessage = 'Failed to connect to wallet';
+                if (error.code === 4001) {
+                    errorMessage = 'Connection rejected by user';
+                } else if (error.code === -32002) {
+                    errorMessage = 'Connection request already pending in MetaMask';
+                } else if (error.message.includes('MetaMask')) {
+                    errorMessage = error.message;
+                } else {
+                    errorMessage = `Connection failed: ${error.message}`;
+                }
+
+                document.getElementById('walletInfo').innerHTML = `
+                    <p style="color: #fed7d7;">${errorMessage}</p>
+                    <button id="connectWallet" class="btn" style="max-width: 300px; margin: 10px auto;">
+                        Try Again
+                    </button>
+                `;
+
+                // Setup retry button
+                document.getElementById('connectWallet').addEventListener('click', connectWallet);
+            }
+        }
+
+        async function verifyContractConnection() {
+            try {
+                // Test contract connection by calling a view function
+                const currentOrderId = await contract.getCurrentOrderId();
+                document.getElementById('contractAddress').textContent = CONTRACT_ADDRESS;
+                document.getElementById('contractStatus').textContent = 'Connected';
+                document.getElementById('contractInfo').style.display = 'block';
+
+                // Check if user is the owner
+                const owner = await contract.owner();
+                if (owner.toLowerCase() === userAddress.toLowerCase()) {
+                    showStatus('walletInfo', 'Connected as contract owner', 'success');
+                }
+
+            } catch (error) {
+                console.error("Contract connection failed:", error);
+                document.getElementById('contractStatus').textContent = 'Connection Failed';
+                document.getElementById('contractInfo').style.display = 'block';
+                showStatus('walletInfo', 'Contract connection failed. Please check the contract address and network.', 'error');
+                throw error;
+            }
+        }
+
+        function updateWalletInfo() {
+            document.getElementById('walletInfo').innerHTML = `
+                <p>🔗 Connected: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}</p>
+                <p>Network: Sepolia Testnet</p>
+                <button id="disconnectWallet" class="btn" style="max-width: 200px; margin: 10px auto; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                    Disconnect
+                </button>
+            `;
+
+            // Setup disconnect button
+            document.getElementById('disconnectWallet').addEventListener('click', disconnectWallet);
+        }
+
+        function disconnectWallet() {
+            // Reset variables
+            provider = null;
+            signer = null;
+            contract = null;
+            userAddress = null;
+
+            // Reset UI
+            document.getElementById('walletInfo').innerHTML = `
+                <p>Ready to connect to PrivacyPharma</p>
+                <button id="connectWallet" class="btn" style="max-width: 300px; margin: 10px auto;">
+                    Connect Wallet
+                </button>
+            `;
+            document.getElementById('contractInfo').style.display = 'none';
+            document.getElementById('ordersList').innerHTML = `
+                <div class="status info">
+                    <p>Connect your wallet to view orders</p>
+                </div>
+            `;
+
+            // Clear all status messages
+            const statusElements = ['orderStatus', 'bidStatus', 'matchStatus', 'fulfillStatus', 'verifyStatus'];
+            statusElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
+
+            // Disable forms
+            disableForms();
+
+            // Setup connect wallet button again
+            document.getElementById('connectWallet').addEventListener('click', connectWallet);
+        }
+
+        function enableForms() {
+            // Enable all form inputs and buttons
+            const formElements = document.querySelectorAll('#orderForm input, #bidForm input, #matchForm input, #fulfillForm input, #verifyForm input');
+            formElements.forEach(element => {
+                element.disabled = false;
+            });
+
+            const buttons = document.querySelectorAll('#orderForm button[type="submit"], #bidForm button[type="submit"], #matchForm button[type="submit"], #fulfillForm button[type="submit"], #verifyForm button[type="submit"], #refreshOrders');
+            buttons.forEach(button => {
+                button.disabled = false;
+            });
+
+            // Hide disabled messages
+            const disabledMessages = ['orderFormDisabled', 'bidFormDisabled', 'matchFormDisabled', 'fulfillFormDisabled', 'verifyFormDisabled'];
+            disabledMessages.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
+        }
+
+        function disableForms() {
+            // Disable all form inputs and buttons
+            const formElements = document.querySelectorAll('#orderForm input, #bidForm input, #matchForm input, #fulfillForm input, #verifyForm input');
+            formElements.forEach(element => {
+                element.disabled = true;
+            });
+
+            const buttons = document.querySelectorAll('#orderForm button[type="submit"], #bidForm button[type="submit"], #matchForm button[type="submit"], #fulfillForm button[type="submit"], #verifyForm button[type="submit"], #refreshOrders');
+            buttons.forEach(button => {
+                button.disabled = true;
+            });
+
+            // Show disabled messages
+            const disabledMessages = ['orderFormDisabled', 'bidFormDisabled', 'matchFormDisabled', 'fulfillFormDisabled', 'verifyFormDisabled'];
+            disabledMessages.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'block';
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Order form
+            document.getElementById('orderForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const drugId = document.getElementById('drugId').value;
+                const quantity = document.getElementById('quantity').value;
+                const maxBudget = document.getElementById('maxBudget').value;
+
+                try {
+                    showStatus('orderStatus', 'Creating anonymous order...', 'info');
+                    const tx = await contract.createOrder(drugId, quantity, maxBudget);
+                    showStatus('orderStatus', 'Transaction submitted. Waiting for confirmation...', 'info');
+                    await tx.wait();
+                    showStatus('orderStatus', `Order created successfully! Transaction: ${tx.hash}`, 'success');
+                    document.getElementById('orderForm').reset();
+                    loadOrders();
+                } catch (error) {
+                    console.error('Order creation error:', error);
+                    showStatus('orderStatus', `Error: ${error.reason || error.message}`, 'error');
+                }
+            });
+
+            // Bid form
+            document.getElementById('bidForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const orderId = document.getElementById('orderIdBid').value;
+                const price = document.getElementById('bidPrice').value;
+                const availableQty = document.getElementById('availableQuantity').value;
+
+                try {
+                    // Check if user is verified supplier
+                    const isVerified = await contract.isVerifiedSupplier(userAddress);
+                    if (!isVerified) {
+                        showStatus('bidStatus', 'You must be a verified supplier to submit bids', 'error');
+                        return;
+                    }
+
+                    showStatus('bidStatus', 'Submitting encrypted bid...', 'info');
+                    const tx = await contract.submitBid(orderId, price, availableQty);
+                    showStatus('bidStatus', 'Transaction submitted. Waiting for confirmation...', 'info');
+                    await tx.wait();
+                    showStatus('bidStatus', `Bid submitted successfully! Transaction: ${tx.hash}`, 'success');
+                    document.getElementById('bidForm').reset();
+                } catch (error) {
+                    console.error('Bid submission error:', error);
+                    showStatus('bidStatus', `Error: ${error.reason || error.message}`, 'error');
+                }
+            });
+
+            // Match form
+            document.getElementById('matchForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const orderId = document.getElementById('orderIdMatch').value;
+
+                try {
+                    showStatus('matchStatus', 'Finding best supplier...', 'info');
+                    const tx = await contract.matchOrder(orderId);
+                    showStatus('matchStatus', 'Transaction submitted. Waiting for confirmation...', 'info');
+                    await tx.wait();
+                    showStatus('matchStatus', `Order matched successfully! Transaction: ${tx.hash}`, 'success');
+                    document.getElementById('matchForm').reset();
+                    loadOrders();
+                } catch (error) {
+                    console.error('Order matching error:', error);
+                    showStatus('matchStatus', `Error: ${error.reason || error.message}`, 'error');
+                }
+            });
+
+            // Fulfill form
+            document.getElementById('fulfillForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const orderId = document.getElementById('orderIdFulfill').value;
+
+                try {
+                    showStatus('fulfillStatus', 'Fulfilling order...', 'info');
+                    const tx = await contract.fulfillOrder(orderId);
+                    showStatus('fulfillStatus', 'Transaction submitted. Waiting for confirmation...', 'info');
+                    await tx.wait();
+                    showStatus('fulfillStatus', `Order fulfilled successfully! Transaction: ${tx.hash}`, 'success');
+                    document.getElementById('fulfillForm').reset();
+                    loadOrders();
+                } catch (error) {
+                    console.error('Order fulfillment error:', error);
+                    showStatus('fulfillStatus', `Error: ${error.reason || error.message}`, 'error');
+                }
+            });
+
+            // Verify form
+            document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const supplierAddress = document.getElementById('supplierAddress').value;
+
+                try {
+                    // Check if user is owner
+                    const owner = await contract.owner();
+                    if (owner.toLowerCase() !== userAddress.toLowerCase()) {
+                        showStatus('verifyStatus', 'Only the contract owner can verify suppliers', 'error');
+                        return;
+                    }
+
+                    showStatus('verifyStatus', 'Verifying supplier...', 'info');
+                    const tx = await contract.verifySupplier(supplierAddress);
+                    showStatus('verifyStatus', 'Transaction submitted. Waiting for confirmation...', 'info');
+                    await tx.wait();
+                    showStatus('verifyStatus', `Supplier verified successfully! Transaction: ${tx.hash}`, 'success');
+                    document.getElementById('verifyForm').reset();
+                } catch (error) {
+                    console.error('Supplier verification error:', error);
+                    showStatus('verifyStatus', `Error: ${error.reason || error.message}`, 'error');
+                }
+            });
+
+            // Refresh orders
+            document.getElementById('refreshOrders').addEventListener('click', loadOrders);
+        }
+
+        async function loadOrders() {
+            if (!contract) return;
+
+            try {
+                document.getElementById('ordersLoading').style.display = 'block';
+                const currentOrderId = await contract.getCurrentOrderId();
+                const ordersList = document.getElementById('ordersList');
+                ordersList.innerHTML = '';
+
+                if (currentOrderId <= 1) {
+                    ordersList.innerHTML = '<p>No orders found</p>';
+                    return;
+                }
+
+                // Load recent orders (last 10 or all if less than 10)
+                const startId = Math.max(1, currentOrderId - 10);
+                const orderPromises = [];
+
+                for (let i = startId; i < currentOrderId; i++) {
+                    orderPromises.push(loadOrderDetails(i));
+                }
+
+                const orders = await Promise.allSettled(orderPromises);
+
+                orders.forEach((result, index) => {
+                    if (result.status === 'fulfilled' && result.value) {
+                        ordersList.appendChild(result.value);
+                    }
+                });
+
+                if (ordersList.children.length === 0) {
+                    ordersList.innerHTML = '<p>No orders found</p>';
+                }
+
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                document.getElementById('ordersList').innerHTML = '<p>Error loading orders</p>';
+            } finally {
+                document.getElementById('ordersLoading').style.display = 'none';
+            }
+        }
+
+        async function loadOrderDetails(orderId) {
+            try {
+                const orderInfo = await contract.getOrderInfo(orderId);
+                const orderItem = document.createElement('div');
+                orderItem.className = 'order-item';
+
+                const isActive = orderInfo[0];
+                const isFulfilled = orderInfo[1];
+                const buyer = orderInfo[2];
+                const supplier = orderInfo[3];
+                const orderTime = orderInfo[4];
+                const bidCount = orderInfo[5];
+
+                let statusText = 'Inactive';
+                if (isActive) statusText = 'Active';
+                else if (isFulfilled) statusText = 'Fulfilled';
+
+                orderItem.innerHTML = `
+                    <h4>Order #${orderId}</h4>
+                    <div class="order-meta">
+                        <p><strong>Buyer:</strong> ${buyer.slice(0, 6)}...${buyer.slice(-4)}</p>
+                        <p><strong>Supplier:</strong> ${supplier !== '0x0000000000000000000000000000000000000000' ? supplier.slice(0, 6) + '...' + supplier.slice(-4) : 'Not assigned'}</p>
+                        <p><strong>Status:</strong> ${statusText}</p>
+                        <p><strong>Bids:</strong> ${bidCount.toString()}</p>
+                        <p><strong>Created:</strong> ${new Date(orderTime.toNumber() * 1000).toLocaleString()}</p>
+                    </div>
+                `;
+
+                return orderItem;
+            } catch (error) {
+                console.log(`Order ${orderId} not found or error loading:`, error);
+                return null;
+            }
+        }
+
+        function showStatus(elementId, message, type) {
+            const statusEl = document.getElementById(elementId);
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 8000);
+            }
+        }
+
+        // Check for network changes
+        if (window.ethereum) {
+            window.ethereum.on('chainChanged', (chainId) => {
+                window.location.reload();
+            });
+
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    showStatus('walletInfo', 'Please connect your wallet', 'error');
+                } else {
+                    window.location.reload();
+                }
+            });
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            if (typeof ethers !== 'undefined') {
+                init();
+            } else {
+                console.log('Ethers.js not loaded yet, waiting for fallback...');
+                // The fallback script will call init() when loaded
+            }
+        });
+    </script>
+</body>
+</html>

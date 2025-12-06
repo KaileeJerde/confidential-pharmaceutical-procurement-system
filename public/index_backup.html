@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivacyPharma - Anonymous Pharmaceutical Procurement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background-color: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status.error {
+            background-color: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fc8181;
+        }
+
+        .status.info {
+            background-color: #bee3f8;
+            color: #2a69ac;
+            border: 1px solid #90cdf4;
+        }
+
+        .orders-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .order-item {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .order-item h4 {
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .order-meta {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .wallet-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .grid-full {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 PrivacyPharma</h1>
+            <p>Anonymous Pharmaceutical Procurement using Fully Homomorphic Encryption</p>
+        </div>
+
+        <div class="wallet-info" id="walletInfo">
+            <p>Connect your wallet to start using PrivacyPharma</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Buyer Panel -->
+            <div class="panel">
+                <h2>📋 Create Order (Buyer)</h2>
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="drugId">Drug ID:</label>
+                        <input type="number" id="drugId" min="1" placeholder="Enter drug identifier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" min="1" placeholder="Enter quantity needed" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="maxBudget">Maximum Budget (Wei):</label>
+                        <input type="number" id="maxBudget" min="1" placeholder="Enter maximum budget" required>
+                    </div>
+                    <button type="submit" class="btn">Create Anonymous Order</button>
+                </form>
+                <div id="orderStatus" class="status" style="display: none;"></div>
+            </div>
+
+            <!-- Supplier Panel -->
+            <div class="panel">
+                <h2>💊 Submit Bid (Supplier)</h2>
+                <form id="bidForm">
+                    <div class="form-group">
+                        <label for="orderIdBid">Order ID:</label>
+                        <input type="number" id="orderIdBid" min="1" placeholder="Enter order ID to bid on" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bidPrice">Your Price (Wei):</label>
+                        <input type="number" id="bidPrice" min="1" placeholder="Enter your price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="availableQuantity">Available Quantity:</label>
+                        <input type="number" id="availableQuantity" min="1" placeholder="Enter available quantity" required>
+                    </div>
+                    <button type="submit" class="btn">Submit Encrypted Bid</button>
+                </form>
+                <div id="bidStatus" class="status" style="display: none;"></div>
+            </div>
+
+            <!-- Order Management Panel -->
+            <div class="panel">
+                <h2>🎯 Match Order</h2>
+                <form id="matchForm">
+                    <div class="form-group">
+                        <label for="orderIdMatch">Order ID to Match:</label>
+                        <input type="number" id="orderIdMatch" min="1" placeholder="Enter order ID" required>
+                    </div>
+                    <button type="submit" class="btn">Find Best Supplier</button>
+                </form>
+                <div id="matchStatus" class="status" style="display: none;"></div>
+            </div>
+
+            <!-- Fulfillment Panel -->
+            <div class="panel">
+                <h2>✅ Fulfill Order</h2>
+                <form id="fulfillForm">
+                    <div class="form-group">
+                        <label for="orderIdFulfill">Order ID to Fulfill:</label>
+                        <input type="number" id="orderIdFulfill" min="1" placeholder="Enter order ID" required>
+                    </div>
+                    <button type="submit" class="btn">Fulfill Order</button>
+                </form>
+                <div id="fulfillStatus" class="status" style="display: none;"></div>
+            </div>
+
+            <!-- Orders Display -->
+            <div class="panel grid-full">
+                <h2>📊 Recent Orders</h2>
+                <button id="refreshOrders" class="btn">Refresh Orders</button>
+                <div class="loading" id="ordersLoading">
+                    <div class="spinner"></div>
+                    <p>Loading orders...</p>
+                </div>
+                <div class="orders-list" id="ordersList">
+                    <!-- Orders will be populated here -->
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div class="panel grid-full">
+                <h2>👑 Admin Panel</h2>
+                <form id="verifyForm">
+                    <div class="form-group">
+                        <label for="supplierAddress">Supplier Address to Verify:</label>
+                        <input type="text" id="supplierAddress" placeholder="0x..." required>
+                    </div>
+                    <button type="submit" class="btn">Verify Supplier</button>
+                </form>
+                <div id="verifyStatus" class="status" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <script>
+        // Contract configuration
+        const CONTRACT_ADDRESS = "YOUR_CONTRACT_ADDRESS_HERE";
+        const CONTRACT_ABI = [
+            "function createOrder(uint32 _drugId, uint32 _quantity, uint64 _maxBudget) external",
+            "function submitBid(uint32 orderId, uint64 _price, uint32 _availableQuantity) external",
+            "function matchOrder(uint32 orderId) external",
+            "function fulfillOrder(uint32 orderId) external",
+            "function verifySupplier(address supplier) external",
+            "function getOrderInfo(uint32 orderId) external view returns (bool, bool, address, address, uint256, uint256)",
+            "function getCurrentOrderId() external view returns (uint32)",
+            "function isVerifiedSupplier(address supplier) external view returns (bool)",
+            "function getBidStatus(uint32 orderId, address supplier) external view returns (bool, uint256, bool)",
+            "event OrderCreated(uint32 indexed orderId, address indexed buyer, uint256 orderTime)",
+            "event BidSubmitted(address indexed supplier, uint32 indexed orderId)",
+            "event OrderMatched(uint32 indexed orderId, address indexed buyer, address indexed supplier)",
+            "event OrderFulfilled(uint32 indexed orderId, uint32 drugId, uint32 quantity, uint64 price)"
+        ];
+
+        let provider, signer, contract, userAddress;
+
+        // Initialize Web3 connection
+        async function init() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                    updateWalletInfo();
+                    setupEventListeners();
+                    loadOrders();
+                } catch (error) {
+                    console.error("Failed to connect to wallet:", error);
+                    showStatus('walletInfo', 'Please install MetaMask or connect your wallet', 'error');
+                }
+            } else {
+                showStatus('walletInfo', 'Please install MetaMask to use this application', 'error');
+            }
+        }
+
+        function updateWalletInfo() {
+            document.getElementById('walletInfo').innerHTML = `
+                <p>🔗 Connected: ${userAddress}</p>
+                <p>Network: Sepolia Testnet</p>
+            `;
+        }
+
+        function setupEventListeners() {
+            // Order form
+            document.getElementById('orderForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const drugId = document.getElementById('drugId').value;
+                const quantity = document.getElementById('quantity').value;
+                const maxBudget = document.getElementById('maxBudget').value;
+
+                try {
+                    showStatus('orderStatus', 'Creating anonymous order...', 'info');
+                    const tx = await contract.createOrder(drugId, quantity, maxBudget);
+                    await tx.wait();
+                    showStatus('orderStatus', 'Order created successfully!', 'success');
+                    loadOrders();
+                } catch (error) {
+                    showStatus('orderStatus', `Error: ${error.message}`, 'error');
+                }
+            });
+
+            // Bid form
+            document.getElementById('bidForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const orderId = document.getElementById('orderIdBid').value;
+                const price = document.getElementById('bidPrice').value;
+                const availableQty = document.getElementById('availableQuantity').value;
+
+                try {
+                    showStatus('bidStatus', 'Submitting encrypted bid...', 'info');
+                    const tx = await contract.submitBid(orderId, price, availableQty);
+                    await tx.wait();
+                    showStatus('bidStatus', 'Bid submitted successfully!', 'success');
+                } catch (error) {
+                    showStatus('bidStatus', `Error: ${error.message}`, 'error');
+                }
+            });
+
+            // Match form
+            document.getElementById('matchForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const orderId = document.getElementById('orderIdMatch').value;
+
+                try {
+                    showStatus('matchStatus', 'Finding best supplier...', 'info');
+                    const tx = await contract.matchOrder(orderId);
+                    await tx.wait();
+                    showStatus('matchStatus', 'Order matched successfully!', 'success');
+                    loadOrders();
+                } catch (error) {
+                    showStatus('matchStatus', `Error: ${error.message}`, 'error');
+                }
+            });
+
+            // Fulfill form
+            document.getElementById('fulfillForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const orderId = document.getElementById('orderIdFulfill').value;
+
+                try {
+                    showStatus('fulfillStatus', 'Fulfilling order...', 'info');
+                    const tx = await contract.fulfillOrder(orderId);
+                    await tx.wait();
+                    showStatus('fulfillStatus', 'Order fulfilled successfully!', 'success');
+                    loadOrders();
+                } catch (error) {
+                    showStatus('fulfillStatus', `Error: ${error.message}`, 'error');
+                }
+            });
+
+            // Verify form
+            document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const supplierAddress = document.getElementById('supplierAddress').value;
+
+                try {
+                    showStatus('verifyStatus', 'Verifying supplier...', 'info');
+                    const tx = await contract.verifySupplier(supplierAddress);
+                    await tx.wait();
+                    showStatus('verifyStatus', 'Supplier verified successfully!', 'success');
+                } catch (error) {
+                    showStatus('verifyStatus', `Error: ${error.message}`, 'error');
+                }
+            });
+
+            // Refresh orders
+            document.getElementById('refreshOrders').addEventListener('click', loadOrders);
+        }
+
+        async function loadOrders() {
+            try {
+                document.getElementById('ordersLoading').style.display = 'block';
+                const currentOrderId = await contract.getCurrentOrderId();
+                const ordersList = document.getElementById('ordersList');
+                ordersList.innerHTML = '';
+
+                for (let i = Math.max(1, currentOrderId - 10); i < currentOrderId; i++) {
+                    try {
+                        const orderInfo = await contract.getOrderInfo(i);
+                        const orderItem = document.createElement('div');
+                        orderItem.className = 'order-item';
+
+                        orderItem.innerHTML = `
+                            <h4>Order #${i}</h4>
+                            <div class="order-meta">
+                                <p><strong>Buyer:</strong> ${orderInfo[2]}</p>
+                                <p><strong>Supplier:</strong> ${orderInfo[3] !== '0x0000000000000000000000000000000000000000' ? orderInfo[3] : 'Not assigned'}</p>
+                                <p><strong>Status:</strong> ${orderInfo[0] ? 'Active' : (orderInfo[1] ? 'Fulfilled' : 'Inactive')}</p>
+                                <p><strong>Bids:</strong> ${orderInfo[5]}</p>
+                                <p><strong>Created:</strong> ${new Date(orderInfo[4] * 1000).toLocaleString()}</p>
+                            </div>
+                        `;
+                        ordersList.appendChild(orderItem);
+                    } catch (error) {
+                        console.log(`Order ${i} not found or error loading`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            } finally {
+                document.getElementById('ordersLoading').style.display = 'none';
+            }
+        }
+
+        function showStatus(elementId, message, type) {
+            const statusEl = document.getElementById(elementId);
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
