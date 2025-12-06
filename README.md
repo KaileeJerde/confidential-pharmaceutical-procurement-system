@@ -23,6 +23,8 @@
 - [Advanced Patterns](#advanced-patterns)
 - [Troubleshooting](#troubleshooting)
 - [Competition Submission](#competition-submission)
+- [Live Demo](https://confidential-pharmaceutical-procure.vercel.app/)
+- [Video](https://streamable.com/o9swbz)
 
 ---
 
