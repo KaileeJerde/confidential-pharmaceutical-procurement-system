@@ -24,7 +24,7 @@
 - [Troubleshooting](#troubleshooting)
 - [Competition Submission](#competition-submission)
 - [Live Demo](https://confidential-pharmaceutical-procure.vercel.app/)
-- [Video](https://streamable.com/o9swbz)
+- [Video ](https://streamable.com/o9swbz) confidential pharmaceutical procurement system.mp4
 
 ---
 
